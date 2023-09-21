@@ -1,5 +1,7 @@
 package com.example.dzdataaccessobject.controller;
 
+import com.example.dzdataaccessobject.entity.Customers;
+import com.example.dzdataaccessobject.entity.Orders;
 import com.example.dzdataaccessobject.service.SqlService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,7 +18,7 @@ public class SqlController {
     }
 
     @GetMapping("/products/fetch-product")
-    public List<String> fetchProduct(@RequestParam("name") String name) {
+    public List<Orders> fetchProduct(@RequestParam("name") String name) {
 
         return service.getProducts(name);
     }

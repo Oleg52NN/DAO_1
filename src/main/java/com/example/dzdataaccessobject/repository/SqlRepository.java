@@ -1,41 +1,32 @@
 package com.example.dzdataaccessobject.repository;
 
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import com.example.dzdataaccessobject.entity.Customers;
+import com.example.dzdataaccessobject.entity.Orders;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Repository
-
+@AllArgsConstructor
 public class SqlRepository {
-    private final NamedParameterJdbcTemplate template;
-    private final String sql;
 
-    public SqlRepository(NamedParameterJdbcTemplate template) {
-        this.template = template;
-        this.sql = read("join.sql");
-    }
+    @PersistenceContext
+    private EntityManager entityManager;
 
-    private static String read(String sqlFileName) {
-        try (InputStream is = new ClassPathResource(sqlFileName).getInputStream();
-             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is))) {
-            return bufferedReader.lines().collect(Collectors.joining("\n"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
-    public List<String> getProductName(String name) {
-        return template.queryForList(
-                this.sql,
-                Map.of("name", name),
-                String.class);
+    public List<Orders> getProductName(String name) {
+
+        Customers customers = entityManager.createQuery("select p from Customers p where p.name = :name", Customers.class)
+                .setParameter("name", name)
+                .getSingleResult();
+        System.out.println(customers.getId() + "Mame = " + name + "Phone " + customers.getPhoneNumber());
+        int customersId = customers.getId();
+        return entityManager.createQuery("select p from Orders as p where p.customerId = :customersId", Orders.class)
+                .setParameter("customersId", customersId)
+                .getResultList();
+
     }
 }
